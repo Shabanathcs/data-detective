@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Detective – Grade 6 AI</title>
+<meta name="description" content="Grade 6 AI class: Basic Data Concepts – data types and organising data with tables and charts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f7fb; --card:#ffffff; --ink:#1d2433; --muted:#5b6475; --line:#dde3ee;
+  --primary:#2457d6; --primary-soft:#e6edfc;
+  --num:#2457d6; --num-soft:#e6edfc;
+  --txt:#0f8a5f; --txt-soft:#e1f5ec;
+  --img:#c2410c; --img-soft:#fdeee4;
+  --snd:#7c3aed; --snd-soft:#f0e9fe;
+  --ok:#15803d; --ok-soft:#dcfce7; --bad:#dc2626; --bad-soft:#fee2e2;
+  --gold:#d4a017;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",system-ui,sans-serif;font-size:17px;line-height:1.55}
+h1,h2,h3{font-family:"Baloo 2",system-ui,sans-serif;line-height:1.15;margin:0 0 .4em}
+h1{font-size:clamp(2rem,6vw,3.3rem)} h2{font-size:clamp(1.5rem,4vw,2.2rem)} h3{font-size:1.25rem}
+p{margin:.3em 0 .8em}
+button{font:inherit;cursor:pointer}
+
+/* Top bar */
+.topbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 2px 10px rgba(20,40,90,.06)}
+.topbar-in{max-width:1100px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-family:"Baloo 2";font-weight:800;font-size:1.25rem;color:var(--primary);display:flex;align-items:center;gap:6px}
+.player{font-size:.9rem;color:var(--muted)}
+.score-pill{margin-left:auto;background:var(--primary);color:#fff;border-radius:999px;padding:4px 14px;font-weight:800}
+.timer{display:flex;align-items:center;gap:6px;font-weight:800;background:var(--primary-soft);border-radius:999px;padding:3px 6px 3px 12px}
+.timer button{border:0;background:#fff;border-radius:999px;padding:2px 10px;font-weight:700;font-size:.85rem}
+.steps{max-width:1100px;margin:0 auto;padding:0 16px 8px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.steps::-webkit-scrollbar{display:none}
+.steps button{flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:4px 12px;font-size:.85rem;font-weight:700}
+.steps button.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.steps button.done{border-color:var(--ok);color:var(--ok)}
+.steps button.on,.steps button.on.done{background:var(--primary);border-color:var(--primary);color:#fff}
+
+main{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+section.page{display:none;animation:fade .35s ease}
+section.page.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 4px 18px rgba(20,40,90,.05);margin-bottom:18px}
+.tag{display:inline-block;font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--primary);background:var(--primary-soft);border-radius:999px;padding:3px 10px;margin-bottom:8px}
+.time{float:right;font-size:.8rem;font-weight:700;color:var(--muted)}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:10px}
+.btn{border:0;border-radius:12px;padding:10px 20px;font-weight:800;background:var(--primary);color:#fff;box-shadow:0 3px 0 #173c9c}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #173c9c}
+.btn.ghost{background:#fff;color:var(--primary);border:2px solid var(--primary);box-shadow:none}
+.btn.green{background:var(--ok);box-shadow:0 3px 0 #0f5c2c}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.note{background:#fff8e1;border-left:5px solid var(--gold);border-radius:10px;padding:10px 14px;margin:10px 0}
+.fb{margin-top:10px;font-weight:800;min-height:1.4em}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#2457d6,#4f7cf0 60%,#7c3aed);color:#fff;border:0}
+.hero p{color:#e8eeff}
+.hero .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.hero input,.hero select{font:inherit;border:0;border-radius:12px;padding:10px 14px;min-width:0;flex:1 1 180px}
+.hero .btn{background:#ffd23f;color:#1d2433;box-shadow:0 3px 0 #b8901a}
+.hook{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px}
+.hook div{background:rgba(255,255,255,.14);border-radius:14px;padding:12px;text-align:center;font-weight:700}
+.hook .big{font-size:2rem;display:block}
+
+/* Data type cards */
+.dt{border-radius:16px;padding:16px;border:2px solid}
+.dt h3{display:flex;align-items:center;gap:8px}
+.dt .ic{font-size:1.8rem}
+.dt.n{background:var(--num-soft);border-color:var(--num)} .dt.n h3{color:var(--num)}
+.dt.t{background:var(--txt-soft);border-color:var(--txt)} .dt.t h3{color:var(--txt)}
+.dt.i{background:var(--img-soft);border-color:var(--img)} .dt.i h3{color:var(--img)}
+.dt.s{background:var(--snd-soft);border-color:var(--snd)} .dt.s h3{color:var(--snd)}
+.dt ul{margin:.2em 0 .6em;padding-left:1.1em}
+.mini{border:0;border-radius:10px;padding:6px 12px;font-weight:800;color:#fff}
+.pixel{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;width:128px;margin:6px 0}
+.pixel span{aspect-ratio:1;border-radius:2px;background:#fff}
+.pixel span.on{background:var(--img)}
+
+/* Sorter */
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:60px;padding:12px;border:2px dashed var(--line);border-radius:14px;background:#fafbfe}
+.chip{background:#fff;border:2px solid var(--line);border-radius:12px;padding:7px 12px;font-weight:700;user-select:none;touch-action:manipulation;cursor:grab;transition:transform .12s}
+.chip.sel{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft);transform:scale(1.05)}
+.chip.right{border-color:var(--ok);background:var(--ok-soft)}
+.chip.wrong{border-color:var(--bad);background:var(--bad-soft);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:14px}
+.bin{border-radius:16px;border:3px solid;min-height:150px;padding:10px;display:flex;flex-direction:column;gap:6px;transition:background .15s}
+.bin h3{margin:0 0 4px;font-size:1.1rem}
+.bin.over{filter:brightness(.95)}
+.bin[data-type=number]{border-color:var(--num);background:var(--num-soft)} .bin[data-type=number] h3{color:var(--num)}
+.bin[data-type=text]{border-color:var(--txt);background:var(--txt-soft)} .bin[data-type=text] h3{color:var(--txt)}
+.bin[data-type=image]{border-color:var(--img);background:var(--img-soft)} .bin[data-type=image] h3{color:var(--img)}
+.bin[data-type=sound]{border-color:var(--snd);background:var(--snd-soft)} .bin[data-type=sound] h3{color:var(--snd)}
+
+/* Survey */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.resp{border:2px solid var(--line);background:#fff;border-radius:12px;padding:8px 10px;text-align:left;font-weight:700;font-size:.92rem;transition:.15s}
+.resp small{display:block;color:var(--muted);font-weight:600}
+.resp.used{opacity:.3;text-decoration:line-through;pointer-events:none}
+.resp.sel{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+table.dtab{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden}
+.dtab th,.dtab td{border:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:middle}
+.dtab th{background:var(--primary);color:#fff;font-family:"Baloo 2";font-size:1.05rem}
+.dtab tr.row{cursor:pointer}
+.dtab tr.row:hover td{background:#f5f8ff}
+.dtab tr.row.flash td{background:var(--ok-soft)}
+.tally{font-family:monospace;font-size:1.15rem;letter-spacing:1px;color:var(--ink);word-break:break-all}
+.dtab input{width:70px;font:inherit;font-weight:800;padding:5px 8px;border:2px solid var(--line);border-radius:8px}
+.dtab input.right{border-color:var(--ok);background:var(--ok-soft)}
+.dtab input.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.dtab tfoot td{font-weight:800;background:#f6f8fc}
+.tblwrap{overflow-x:auto}
+
+/* Chart */
+.toggle{display:inline-flex;background:var(--primary-soft);border-radius:999px;padding:4px;gap:4px;margin-bottom:12px}
+.toggle button{border:0;background:transparent;border-radius:999px;padding:6px 16px;font-weight:800;color:var(--primary)}
+.toggle button.on{background:var(--primary);color:#fff}
+.chart{display:flex;align-items:flex-end;gap:12px;height:260px;padding:10px 10px 0 40px;border-left:2px solid var(--ink);border-bottom:2px solid var(--ink);position:relative;margin:10px 0 78px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative}
+.bar .b{width:min(60px,80%);border-radius:8px 8px 0 0;transition:height .7s cubic-bezier(.2,.8,.2,1);position:relative}
+.bar .v{font-weight:800;margin-bottom:4px}
+.bar .l{position:absolute;bottom:-62px;font-size:.8rem;font-weight:700;text-align:center;width:100%;line-height:1.15}
+.yl{position:absolute;left:0;font-size:.75rem;color:var(--muted);transform:translateY(50%)}
+.gl{position:absolute;left:40px;right:0;border-top:1px dashed var(--line)}
+.picto{display:grid;gap:8px}
+.picto .pr{display:grid;grid-template-columns:minmax(120px,190px) 1fr;align-items:center;gap:10px;padding:6px 10px;border-radius:10px;background:#fafbfe}
+.picto .pr b{font-size:.92rem}
+.picto .ics{font-size:1.5rem;letter-spacing:2px}
+.q{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;background:#fff}
+.q .opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.opt{border:2px solid var(--line);background:#fff;border-radius:10px;padding:7px 14px;font-weight:700}
+.opt:hover{border-color:var(--primary)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default;color:var(--ink);opacity:1}
+.opt:disabled:not(.right):not(.wrong){opacity:.55}
+
+/* AI */
+.ai{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:14px;background:#fafbfe;border:1px solid var(--line)}
+.ai .e{font-size:2rem}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:center;margin:12px 0;font-weight:800}
+.flow span{background:var(--primary-soft);color:var(--primary);padding:8px 14px;border-radius:12px}
+.flow i{font-style:normal;color:var(--muted)}
+
+/* Result */
+.result{text-align:center}
+.medal{font-size:5rem;line-height:1}
+.breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:16px 0}
+.breakdown div{background:#fafbfe;border:1px solid var(--line);border-radius:12px;padding:10px}
+.breakdown b{display:block;font-size:1.5rem;font-family:"Baloo 2"}
+.exit{text-align:left}
+.exit textarea{width:100%;min-height:80px;font:inherit;padding:10px;border:2px solid var(--line);border-radius:12px}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall 2.6s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding:20px}
+@media (max-width:560px){
+  body{font-size:16px} .card{padding:16px} .chart{gap:6px;padding-left:30px} .gl{left:30px}
+  .bar .l{font-size:.7rem} .picto .pr{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">🔍 Data Detective</div>
+    <div class="player" id="playerTag">Grade 6 · AI</div>
+    <div class="timer" title="Class timer (30 minutes)"><span id="clock">30:00</span><button id="timerBtn">Start</button></div>
+    <div class="score-pill">⭐ <span id="score">0</span></div>
+  </div>
+  <nav class="steps" id="steps"></nav>
+</header>
+
+<main>
+
+<!-- 0. WELCOME / STARTER -->
+<section class="page on" data-title="Start">
+  <div class="card hero">
+    <span class="tag" style="background:#fff;color:#2457d6">Grade 6 · Artificial Intelligence</span>
+    <h1>Become a Data Detective! 🔍</h1>
+    <p>Every app, game and AI you use runs on one thing: <b>DATA</b>. Today you will find it, sort it and turn it into a chart.</p>
+    <div class="hook">
+      <div><span class="big">📱</span>Your phone unlocks with your face</div>
+      <div><span class="big">🗣️</span>Smart speaker understands your voice</div>
+      <div><span class="big">🌡️</span>Weather app shows 34 °C in Sharjah</div>
+      <div><span class="big">💬</span>Chat translates Arabic ↔ English</div>
+    </div>
+    <p style="margin-top:14px"><b>Think:</b> What do all four have in common? What is each one using?</p>
+    <div class="row">
+      <input id="pname" placeholder="Your name" maxlength="30" autocomplete="off">
+      <select id="pclass">
+        <option value="">Class</option>
+      </select>
+      <button class="btn" id="startBtn">Start the case ➜</button>
+    </div>
+    <div class="fb" id="startFb" style="color:#ffd23f"></div>
+  </div>
+  <div class="card">
+    <span class="tag">Today's mission</span>
+    <div class="grid g2">
+      <div>
+        <h3>🎯 Learning objectives</h3>
+        <ul>
+          <li>Define <b>data</b> and identify its types – numbers, text, images and sound.</li>
+          <li>Classify everyday data into the correct data type.</li>
+          <li>Organise data in a table using tally marks.</li>
+          <li>Create and read a bar chart and a pictograph.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>✅ Success criteria – I can…</h3>
+        <ul>
+          <li>sort all 12 data cards into the right type.</li>
+          <li>build a correct tally and frequency table.</li>
+          <li>answer questions by reading a chart.</li>
+          <li>explain why AI needs lots of data.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 1. WHAT IS DATA -->
+<section class="page" data-title="What is Data?">
+  <div class="card">
+    <span class="tag">Learn</span><span class="time">⏱ 4 min</span>
+    <h2>What is data?</h2>
+    <p><b>Data</b> is a collection of <b>facts and figures</b> – words, numbers, pictures or sounds – that can be stored and used by a computer.</p>
+    <div class="note">💡 <b>Data</b> on its own is raw. When we <b>organise</b> it and it starts to make sense, it becomes <b>information</b>.<br>
+    <i>Data:</i> 32, 34, 36 &nbsp;→&nbsp; <i>Information:</i> "Sharjah got hotter from Monday to Wednesday."</div>
+    <h3 style="margin-top:16px">The 4 types of data</h3>
+    <div class="grid g4">
+      <div class="dt n">
+        <h3><span class="ic">🔢</span>Numbers</h3>
+        <p>Values we can count, measure or calculate.</p>
+        <ul><li>Age: 11</li><li>Marks: 87</li><li>Temperature: 34 °C</li></ul>
+        <button class="mini" style="background:var(--num)" onclick="numDemo(this)">Add them!</button>
+        <div id="numOut" style="font-weight:800;margin-top:6px"></div>
+      </div>
+      <div class="dt t">
+        <h3><span class="ic">🔤</span>Text</h3>
+        <p>Letters, words and sentences.</p>
+        <ul><li>Name: Aisha</li><li>Message: "Eid Mubarak!"</li><li>City: Sharjah</li></ul>
+        <button class="mini" style="background:var(--txt)" onclick="speak('Welcome to Sharjah Indian School')">🔊 Read text aloud</button>
+      </div>
+      <div class="dt i">
+        <h3><span class="ic">🖼️</span>Images</h3>
+        <p>Photos and drawings. A computer stores them as tiny dots called <b>pixels</b>.</p>
+        <div class="pixel" id="pixel" aria-label="Pixel heart"></div>
+        <small>8 × 8 = 64 pixels make this heart</small>
+      </div>
+      <div class="dt s">
+        <h3><span class="ic">🎵</span>Sound</h3>
+        <p>Voice, music and alerts. Stored as sound waves.</p>
+        <ul><li>Voice note</li><li>School bell</li><li>Song</li></ul>
+        <button class="mini" style="background:var(--snd)" onclick="bell()">🔔 Play the school bell</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. ACTIVITY 1: SORTER -->
+<section class="page" data-title="Activity 1">
+  <div class="card">
+    <span class="tag">Activity 1 · Data Sorter</span><span class="time">⏱ 6 min · 120 pts</span>
+    <h2>Sort the evidence!</h2>
+    <p>Drag each data card into the correct box. On a touch screen: <b>tap a card, then tap a box</b>. Press <b>Check</b> when all 12 are sorted. Wrong cards turn red and go back – fix them and check again.</p>
+    <div class="pool" id="pool"></div>
+    <div class="bins" id="bins">
+      <div class="bin" data-type="number"><h3>🔢 Numbers</h3></div>
+      <div class="bin" data-type="text"><h3>🔤 Text</h3></div>
+      <div class="bin" data-type="image"><h3>🖼️ Images</h3></div>
+      <div class="bin" data-type="sound"><h3>🎵 Sound</h3></div>
+    </div>
+    <div class="nav" style="justify-content:flex-start"><button class="btn green" id="sortCheck">Check ✔</button><button class="btn ghost" id="sortReset">Reset</button></div>
+    <div class="fb" id="sortFb"></div>
+  </div>
+</section>
+
+<!-- 3. ACTIVITY 2: TABLE -->
+<section class="page" data-title="Activity 2">
+  <div class="card">
+    <span class="tag">Activity 2 · Organise the data</span><span class="time">⏱ 6 min · 60 pts</span>
+    <h2>Survey: "Your favourite place in the UAE?" 🇦🇪</h2>
+    <p>20 Grade 6 students answered. The answers are messy! Organise them:</p>
+    <ol>
+      <li><b>Click a student's answer card</b>, then <b>click the matching row</b> in the table – a tally mark ( | ) is added.</li>
+      <li>When all 20 cards are used, count the tally marks and <b>type the number</b> in the Count column. Fill in the Total too.</li>
+      <li>Press <b>Check</b>.</li>
+    </ol>
+    <div class="note">✏️ Tally tip: we draw 4 lines and cross them with the 5th → <span class="tally">卌</span> = 5</div>
+    <div class="grid g2" style="align-items:start">
+      <div><h3>Answer cards <small id="leftCount" style="color:var(--muted)">(20 left)</small></h3><div class="cards" id="respCards"></div></div>
+      <div class="tblwrap">
+        <h3>Frequency table</h3>
+        <table class="dtab" id="freqTable">
+          <thead><tr><th>Place</th><th>Tally</th><th>Count</th></tr></thead>
+          <tbody></tbody>
+          <tfoot><tr><td colspan="2">Total students</td><td><input id="totalIn" inputmode="numeric" aria-label="Total"></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+    <div class="nav" style="justify-content:flex-start"><button class="btn green" id="tabCheck">Check ✔</button><button class="btn ghost" id="tabReset">Reset</button></div>
+    <div class="fb" id="tabFb"></div>
+  </div>
+</section>
+
+<!-- 4. ACTIVITY 3: CHART -->
+<section class="page" data-title="Activity 3">
+  <div class="card">
+    <span class="tag">Activity 3 · Chart it!</span><span class="time">⏱ 6 min · 40 pts</span>
+    <h2>From table to chart 📊</h2>
+    <p>Your table has been turned into a chart. Switch between a <b>bar chart</b> and a <b>pictograph</b>, then answer the questions by <b>reading the chart</b>.</p>
+    <div class="toggle"><button class="on" data-view="bar">📊 Bar chart</button><button data-view="picto">🧍 Pictograph</button></div>
+    <div id="chartBox"></div>
+    <div id="chartQs"></div>
+    <div class="fb" id="chartFb"></div>
+  </div>
+</section>
+
+<!-- 5. AI CONNECT -->
+<section class="page" data-title="AI & Data">
+  <div class="card">
+    <span class="tag">AI Connect</span><span class="time">⏱ 2 min</span>
+    <h2>How does AI use data? 🤖</h2>
+    <p>AI is like a student – it learns from <b>examples</b>. The more good, organised data it gets, the smarter it becomes.</p>
+    <div class="flow"><span>📥 Collect data</span><i>➜</i><span>🗂️ Organise & label</span><i>➜</i><span>🧠 AI learns patterns</span><i>➜</i><span>🎯 AI predicts</span></div>
+    <div class="grid g2">
+      <div class="ai"><span class="e">🖼️</span><div><b>Images</b> – Face unlock learned from thousands of photos of faces.</div></div>
+      <div class="ai"><span class="e">🎵</span><div><b>Sound</b> – Voice assistants learned from millions of voice recordings.</div></div>
+      <div class="ai"><span class="e">🔤</span><div><b>Text</b> – Translation apps learned from millions of Arabic and English sentences.</div></div>
+      <div class="ai"><span class="e">🔢</span><div><b>Numbers</b> – Weather apps predict tomorrow's temperature from years of past readings.</div></div>
+    </div>
+    <div class="note" style="margin-top:14px">🇦🇪 The UAE uses AI and data in smart services – e.g. Dubai's RTA uses traffic data to plan smoother roads, and the UAE has its own Minister of State for Artificial Intelligence.</div>
+  </div>
+</section>
+
+<!-- 6. QUIZ -->
+<section class="page" data-title="Quiz">
+  <div class="card">
+    <span class="tag">Plenary · Quick quiz</span><span class="time">⏱ 3 min · 50 pts</span>
+    <h2>Case closed? Prove it! 🕵️</h2>
+    <p>One try per question.</p>
+    <div id="quiz"></div>
+    <div class="nav"><span></span><button class="btn" id="finishBtn">See my badge ➜</button></div>
+  </div>
+</section>
+
+<!-- 7. RESULT -->
+<section class="page" data-title="My Badge">
+  <div class="card result">
+    <div class="medal" id="medal">🏅</div>
+    <h2 id="badgeName">Data Detective</h2>
+    <p id="resultLine"></p>
+    <div class="breakdown" id="breakdown"></div>
+    <p id="saveFb" style="color:var(--muted);font-size:.9rem"></p>
+  </div>
+  <div class="card exit">
+    <span class="tag">Exit ticket</span>
+    <h3>🤔 HOT question</h3>
+    <p>"A table and a bar chart show the same data. Which one would you use to show the Principal the most popular place <b>quickly</b>? Why? And why does an AI need <b>thousands</b> of photos, not just 10, to recognise a cat?"</p>
+    <textarea id="exitText" placeholder="Type your answer here…"></textarea>
+    <div class="nav" style="justify-content:flex-start"><button class="btn green" id="exitBtn">Submit answer</button></div>
+    <div class="fb" id="exitFb"></div>
+  </div>
+  <div class="card">
+    <span class="tag">Homework</span>
+    <p>📓 Survey 10 family members or friends: <i>"What is your favourite fruit?"</i> Organise the answers in a <b>tally table</b>, then draw a <b>bar chart or pictograph</b> in your notebook. Label the data type of each item you collected.</p>
+  </div>
+</section>
+
+<div class="nav" id="pageNav" style="max-width:1100px;margin:0 auto">
+  <button class="btn ghost" id="prevBtn">⬅ Back</button>
+  <button class="btn" id="nextBtn">Next ➜</button>
+</div>
+</main>
+
+<footer>Grade 6 · Work Education + AI · Basic Data Concepts · Sharjah Indian School, Juwaiza</footer>
+
+<script>
+/* ====== SETTINGS FOR THE TEACHER ======
+   To save scores to a Google Sheet, paste your Google Apps Script Web App URL below.
+   Leave it empty ("") to run the class without saving scores. */
+const SCORE_URL = "";
+/* ===================================== */
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const pts = {sort:0, table:0, chart:0, quiz:0};
+const MAX = {sort:120, table:60, chart:40, quiz:50};
+let player = {name:"", cls:""};
+
+function addScore(){ $("#score").textContent = Object.values(pts).reduce((a,b)=>a+b,0); }
+
+/* ---------- classes ---------- */
+"ABCDEFGHIJKLMNOPQ".split("").forEach(c=>{ const o=document.createElement("option"); o.value="VI "+c; o.textContent="VI "+c; $("#pclass").appendChild(o); });
+
+/* ---------- pages ---------- */
+const pages = $$("section.page");
+let cur = 0;
+pages.forEach((p,i)=>{
+  const b=document.createElement("button"); b.textContent=(i+1)+". "+p.dataset.title;
+  b.onclick=()=>go(i); $("#steps").appendChild(b);
+});
+function go(i){
+  if(i>0 && !player.name){ $("#startFb").textContent="Please enter your name and class first."; i=0; }
+  cur=Math.max(0,Math.min(pages.length-1,i));
+  pages.forEach((p,k)=>p.classList.toggle("on",k===cur));
+  $$("#steps button").forEach((b,k)=>{ b.classList.toggle("on",k===cur); });
+  $("#prevBtn").style.visibility = cur===0?"hidden":"visible";
+  $("#nextBtn").style.visibility = cur>=pages.length-2?"hidden":"visible";
+  if(pages[cur].dataset.title==="Activity 3") drawChart();
+  if(pages[cur].dataset.title==="My Badge") showResult(false);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function markDone(title){ pages.forEach((p,k)=>{ if(p.dataset.title===title) $$("#steps button")[k].classList.add("done"); }); }
+$("#prevBtn").onclick=()=>go(cur-1);
+$("#nextBtn").onclick=()=>go(cur+1);
+$("#startBtn").onclick=()=>{
+  const n=$("#pname").value.trim(), c=$("#pclass").value;
+  if(!n||!c){ $("#startFb").textContent="Please enter your name and choose your class."; return; }
+  player={name:n,cls:c}; $("#playerTag").textContent=n+" · "+c; $("#startFb").textContent="";
+  go(1);
+};
+go(0);
+
+/* ---------- timer ---------- */
+let left=30*60, tick=null;
+function showClock(){ const m=Math.floor(left/60), s=left%60; $("#clock").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0"); }
+$("#timerBtn").onclick=()=>{
+  if(tick){ clearInterval(tick); tick=null; $("#timerBtn").textContent="Start"; return; }
+  tick=setInterval(()=>{ if(left>0){left--;showClock();} else {clearInterval(tick);tick=null;bell();} },1000);
+  $("#timerBtn").textContent="Pause";
+};
+
+/* ---------- demos ---------- */
+function numDemo(){ $("#numOut").textContent="11 + 87 + 34 = 132 ✔ Computers can calculate with numbers!"; }
+function speak(t){ try{ const u=new SpeechSynthesisUtterance(t); u.rate=.95; speechSynthesis.speak(u);}catch(e){} }
+let actx;
+function tone(f,start,dur){ const o=actx.createOscillator(), g=actx.createGain(); o.type="sine"; o.frequency.value=f; o.connect(g); g.connect(actx.destination);
+  g.gain.setValueAtTime(.0001,actx.currentTime+start); g.gain.exponentialRampToValueAtTime(.3,actx.currentTime+start+.02); g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+start+dur);
+  o.start(actx.currentTime+start); o.stop(actx.currentTime+start+dur+.05); }
+function bell(){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); [659,523,587,392,392,587,659,523].forEach((f,i)=>tone(f,i*.42,.5)); }catch(e){} }
+function ding(ok){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); if(ok){tone(784,0,.15);tone(1047,.12,.25);} else tone(220,0,.25);}catch(e){} }
+const heart=[0,1,1,0,0,1,1,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 0,1,1,1,1,1,1,0, 0,0,1,1,1,1,0,0, 0,0,0,1,1,0,0,0, 0,0,0,0,0,0,0,0];
+heart.forEach(v=>{ const s=document.createElement("span"); if(v) s.className="on"; $("#pixel").appendChild(s); });
+
+/* ---------- confetti ---------- */
+function confetti(){ const box=document.createElement("div"); box.className="confetti"; const cols=["#2457d6","#0f8a5f","#c2410c","#7c3aed","#ffd23f"];
+  for(let i=0;i<70;i++){ const c=document.createElement("i"); c.style.left=Math.random()*100+"vw"; c.style.background=cols[i%5]; c.style.animationDelay=Math.random()*.8+"s"; box.appendChild(c); }
+  document.body.appendChild(box); setTimeout(()=>box.remove(),3600); }
+
+/* ---------- ACTIVITY 1: SORTER ---------- */
+const items=[
+  ["🎂 Age: 11","number"],["📝 Maths marks: 87","number"],["🌡️ Temperature: 34 °C","number"],
+  ["👧 Name: Aisha","text"],["💬 Message: Eid Mubarak!","text"],["📖 A story in a book","text"],
+  ["📷 Photo of Burj Khalifa","image"],["🤳 A selfie","image"],["🎨 Drawing of a falcon","image"],
+  ["🎤 Voice note","sound"],["🔔 School bell ring","sound"],["🎶 UAE national anthem","sound"]
+];
+let sortTries=0, sortDone=false, selected=null;
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function buildSorter(){
+  $("#pool").innerHTML=""; $$(".bin .chip").forEach(c=>c.remove());
+  shuffle([...items]).forEach(([t,ty],i)=>{
+    const c=document.createElement("div"); c.className="chip"; c.textContent=t; c.dataset.type=ty; c.draggable=true; c.id="chip"+i;
+    c.addEventListener("dragstart",e=>{ e.dataTransfer.setData("text/plain",c.id); });
+    c.addEventListener("click",e=>{ e.stopPropagation(); if(sortDone) return; if(selected) selected.classList.remove("sel"); selected = selected===c?null:c; if(selected) c.classList.add("sel"); });
+    $("#pool").appendChild(c);
+  });
+}
+[...$$(".bin"), $("#pool")].forEach(z=>{
+  z.addEventListener("dragover",e=>{e.preventDefault(); z.classList.add("over");});
+  z.addEventListener("dragleave",()=>z.classList.remove("over"));
+  z.addEventListener("drop",e=>{ e.preventDefault(); z.classList.remove("over"); if(sortDone) return; const c=document.getElementById(e.dataTransfer.getData("text/plain")); if(c){ c.classList.remove("wrong","sel"); z.appendChild(c);} });
+  z.addEventListener("click",()=>{ if(selected && !sortDone){ selected.classList.remove("sel","wrong"); z.appendChild(selected); selected=null; } });
+});
+$("#sortCheck").onclick=()=>{
+  if(sortDone) return;
+  if($("#pool").children.length){ $("#sortFb").className="fb bad"; $("#sortFb").textContent="Sort all 12 cards first! ("+$("#pool").children.length+" left)"; return; }
+  sortTries++; let wrong=0;
+  $$(".bin .chip").forEach(c=>{ const ok=c.dataset.type===c.parentElement.dataset.type; c.classList.toggle("right",ok); if(!ok){ wrong++; c.classList.add("wrong"); } });
+  if(sortTries===1) pts.sort=(12-wrong)*10;
+  addScore();
+  if(!wrong){ sortDone=true; ding(true); confetti(); $("#sortFb").className="fb ok"; $("#sortFb").textContent="🎉 Case solved! All 12 correct. You earned "+pts.sort+" / 120 points."; markDone("Activity 1"); }
+  else { ding(false); $("#sortFb").className="fb bad"; $("#sortFb").textContent="❌ "+wrong+" card(s) in the wrong box. They are going back – try again!"+(sortTries===1?" (Points saved from your first try: "+pts.sort+")":"");
+    setTimeout(()=>$$(".bin .chip.wrong").forEach(c=>{ c.classList.remove("wrong"); $("#pool").appendChild(c); }),1200); }
+};
+$("#sortReset").onclick=()=>{ if(sortDone) return; buildSorter(); $("#sortFb").textContent=""; };
+buildSorter();
+
+/* ---------- ACTIVITY 2: TABLE ---------- */
+const places=[
+  {k:"Burj Khalifa",e:"🏙️",n:6,c:"#2457d6"},
+  {k:"Sharjah Aquarium",e:"🐠",n:5,c:"#0f8a5f"},
+  {k:"Museum of the Future",e:"🚀",n:4,c:"#7c3aed"},
+  {k:"Al Noor Island",e:"🦋",n:3,c:"#c2410c"},
+  {k:"Louvre Abu Dhabi",e:"🖼️",n:2,c:"#d4a017"}
+];
+const names=["Arjun","Fatima","Rehan","Diya","Omar","Sana","Kabir","Ayesha","Rohan","Mariam","Zayd","Nila","Aarav","Huda","Ishaan","Layla","Vihaan","Noor","Adil","Meera"];
+let resp=[], tallies={}, selResp=null, tabTries=0, tabDone=false;
+function buildTable(){
+  resp=[]; places.forEach(p=>{ for(let i=0;i<p.n;i++) resp.push(p.k); }); shuffle(resp);
+  tallies={}; places.forEach(p=>tallies[p.k]=0); selResp=null;
+  $("#respCards").innerHTML="";
+  resp.forEach((r,i)=>{ const b=document.createElement("button"); b.className="resp"; b.innerHTML="<small>"+names[i]+" said:</small>“"+r+"”"; b.dataset.place=r;
+    b.onclick=()=>{ if(tabDone) return; if(selResp) selResp.classList.remove("sel"); selResp=b; b.classList.add("sel"); }; $("#respCards").appendChild(b); });
+  const tb=$("#freqTable tbody"); tb.innerHTML="";
+  places.forEach(p=>{ const tr=document.createElement("tr"); tr.className="row"; tr.dataset.place=p.k;
+    tr.innerHTML="<td>"+p.e+" "+p.k+"</td><td class='tally'></td><td><input inputmode='numeric' aria-label='Count for "+p.k+"'></td>";
+    tr.onclick=e=>{ if(e.target.tagName==="INPUT"||!selResp||tabDone) return;
+      if(selResp.dataset.place!==p.k){ ding(false); $("#tabFb").className="fb bad"; $("#tabFb").textContent="Look again – that student did not choose "+p.k+"."; return; }
+      tallies[p.k]++; selResp.classList.remove("sel"); selResp.classList.add("used"); selResp=null; $("#tabFb").textContent="";
+      tr.querySelector(".tally").textContent=tallyStr(tallies[p.k]); tr.classList.add("flash"); setTimeout(()=>tr.classList.remove("flash"),300);
+      const left=$$(".resp:not(.used)").length; $("#leftCount").textContent="("+left+" left)";
+      if(!left){ $("#tabFb").className="fb ok"; $("#tabFb").textContent="All answers tallied! Now type the counts and the total, then press Check."; }
+    };
+    tb.appendChild(tr); });
+  $("#totalIn").value=""; $("#totalIn").className=""; $("#leftCount").textContent="(20 left)";
+}
+function tallyStr(n){ return "卌 ".repeat(Math.floor(n/5)) + "|".repeat(n%5); }
+$("#tabCheck").onclick=()=>{
+  if(tabDone) return;
+  if($$(".resp:not(.used)").length){ $("#tabFb").className="fb bad"; $("#tabFb").textContent="Tally all 20 answer cards first!"; return; }
+  tabTries++; let right=0;
+  $$("#freqTable tbody tr").forEach(tr=>{ const inp=tr.querySelector("input"); const ok=parseInt(inp.value,10)===tallies[tr.dataset.place]; inp.className=ok?"right":"wrong"; if(ok) right++; });
+  const tOk=parseInt($("#totalIn").value,10)===20; $("#totalIn").className=tOk?"right":"wrong"; if(tOk) right++;
+  if(tabTries===1) pts.table=right*10;
+  addScore();
+  if(right===6){ tabDone=true; ding(true); confetti(); $("#tabFb").className="fb ok"; $("#tabFb").textContent="🎉 Perfect table! You earned "+pts.table+" / 60 points. Go to Activity 3 to see your chart."; markDone("Activity 2"); }
+  else { ding(false); $("#tabFb").className="fb bad"; $("#tabFb").textContent="❌ "+(6-right)+" box(es) are red. Count the tally marks again and fix them."; }
+};
+$("#tabReset").onclick=()=>{ if(tabDone) return; buildTable(); $("#tabFb").textContent=""; };
+buildTable();
+
+/* ---------- ACTIVITY 3: CHART ---------- */
+let view="bar";
+$$(".toggle button").forEach(b=>b.onclick=()=>{ view=b.dataset.view; $$(".toggle button").forEach(x=>x.classList.toggle("on",x===b)); drawChart(); });
+function drawChart(){
+  const box=$("#chartBox");
+  if(view==="bar"){
+    const max=6;
+    let h="<h3 style='text-align:center'>Favourite place in the UAE – Grade 6 survey</h3><div class='chart'>";
+    for(let y=0;y<=max;y+=2){ h+="<div class='yl' style='bottom:"+(y/max*100)+"%'>"+y+"</div>"; if(y) h+="<div class='gl' style='bottom:"+(y/max*100)+"%'></div>"; }
+    places.forEach(p=>{ h+="<div class='bar'><div class='v'>"+p.n+"</div><div class='b' style='height:0;background:"+p.c+"' data-h='"+(p.n/max*100*0.88)+"'></div><div class='l'>"+p.e+"<br>"+p.k+"</div></div>"; });
+    h+="</div><p style='text-align:center;color:var(--muted);font-size:.9rem;margin:0 0 14px'>Y-axis: number of students · X-axis: places</p>";
+    box.innerHTML=h;
+    requestAnimationFrame(()=>setTimeout(()=>$$(".chart .b").forEach(b=>b.style.height=b.dataset.h+"%"),30));
+  } else {
+    let h="<h3>Favourite place in the UAE – Pictograph</h3><p><b>Key:</b> 🧍 = 1 student</p><div class='picto'>";
+    places.forEach(p=>{ h+="<div class='pr'><b>"+p.e+" "+p.k+"</b><span class='ics'>"+"🧍".repeat(p.n)+"</span></div>"; });
+    box.innerHTML=h+"</div>";
+  }
+}
+const chartQs=[
+  ["Which place is the MOST popular?",["Burj Khalifa","Sharjah Aquarium","Louvre Abu Dhabi"],0],
+  ["Which place is the LEAST popular?",["Al Noor Island","Louvre Abu Dhabi","Museum of the Future"],1],
+  ["How many MORE students chose Burj Khalifa than Louvre Abu Dhabi?",["2","4","8"],1],
+  ["How many students chose Sharjah Aquarium OR Al Noor Island?",["8","7","9"],0]
+];
+let chartAnswered=0;
+function buildQs(list,boxSel,key,each,doneTitle,fbSel){
+  const box=$(boxSel); box.innerHTML="";
+  list.forEach((q,qi)=>{
+    const d=document.createElement("div"); d.className="q"; d.innerHTML="<b>"+(qi+1)+". "+q[0]+"</b><div class='opts'></div>";
+    q[1].forEach((o,oi)=>{ const b=document.createElement("button"); b.className="opt"; b.textContent=o;
+      b.onclick=()=>{ const all=d.querySelectorAll(".opt"); all.forEach(x=>x.disabled=true);
+        all[q[2]].classList.add("right");
+        if(oi===q[2]){ pts[key]+=each; ding(true);} else { b.classList.add("wrong"); ding(false);} addScore();
+        if(q[3]){ const ex=document.createElement("p"); ex.style.cssText="margin:8px 0 0;color:var(--muted);font-size:.92rem"; ex.textContent="💡 "+q[3]; d.appendChild(ex); }
+        if([...box.querySelectorAll(".q")].every(x=>x.querySelector(".opt:disabled"))){ markDone(doneTitle); if(fbSel){ $(fbSel).className="fb ok"; $(fbSel).textContent="Done! You scored "+pts[key]+" / "+MAX[key]+" points here."; } }
+      };
+      d.querySelector(".opts").appendChild(b); });
+    box.appendChild(d);
+  });
+}
+buildQs(chartQs,"#chartQs","chart",10,"Activity 3","#chartFb");
+
+/* ---------- QUIZ ---------- */
+const quiz=[
+  ["A voice note sent on WhatsApp is which type of data?",["Text","Sound","Image","Number"],1,"A voice note stores your voice – that is sound data."],
+  ["A computer stores an image as tiny dots called…",["Bytes","Pixels","Tallies","Charts"],1,"Pixels are the tiny coloured dots that make up a picture."],
+  ["In a tally, what does 卌 stand for?",["4","5","10","1"],1,"Four lines crossed by a fifth line = 5."],
+  ["Which is the best way to compare data quickly with a picture?",["A long paragraph","A bar chart","A voice note","A list of names"],1,"Charts let us compare at a glance."],
+  ["Why does AI need lots of data?",["To fill up memory","To learn patterns and make better predictions","To make the computer heavier","It does not need data"],1,"AI learns from many examples – more good data means better learning."]
+];
+buildQs(quiz,"#quiz","quiz",10,"Quiz",null);
+$("#finishBtn").onclick=()=>{ go(pages.length-1); showResult(true); };
+
+/* ---------- RESULT ---------- */
+let saved=false;
+function showResult(send){
+  const total=Object.values(pts).reduce((a,b)=>a+b,0);
+  let medal="🥉", name="Bronze Data Detective";
+  if(total>=230){ medal="🥇"; name="Gold Data Detective"; } else if(total>=170){ medal="🥈"; name="Silver Data Detective"; }
+  $("#medal").textContent=medal; $("#badgeName").textContent=name;
+  $("#resultLine").innerHTML="Well done, <b>"+(player.name||"Detective")+"</b> ("+(player.cls||"")+")! You scored <b>"+total+" / 270</b> points.";
+  $("#breakdown").innerHTML=[["Data Sorter","sort"],["Table","table"],["Chart","chart"],["Quiz","quiz"]].map(([l,k])=>"<div>"+l+"<b>"+pts[k]+" / "+MAX[k]+"</b></div>").join("");
+  if(total>=230) confetti();
+  markDone("My Badge");
+  if(SCORE_URL && send && !saved && player.name){
+    saved=true;
+    fetch(SCORE_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({name:player.name,cls:player.cls,sorter:pts.sort,table:pts.table,chart:pts.chart,quiz:pts.quiz,total:total,badge:name,time:new Date().toLocaleString()})})
+      .then(()=>$("#saveFb").textContent="✔ Your score has been sent to your teacher.")
+      .catch(()=>$("#saveFb").textContent="Score could not be sent – show this screen to your teacher.");
+  } else if(!SCORE_URL){ $("#saveFb").textContent="Show this screen to your teacher."; }
+}
+$("#exitBtn").onclick=()=>{
+  const t=$("#exitText").value.trim();
+  if(t.length<10){ $("#exitFb").className="fb bad"; $("#exitFb").textContent="Write a little more – explain your reason."; return; }
+  $("#exitFb").className="fb ok"; $("#exitFb").textContent="✔ Thank you! Be ready to share your answer with the class.";
+  if(SCORE_URL && player.name){ fetch(SCORE_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({name:player.name,cls:player.cls,exit:t,time:new Date().toLocaleString()})}).catch(()=>{}); }
+};
+</script>
+</body>
+</html>
